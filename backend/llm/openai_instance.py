@@ -24,18 +24,26 @@ import openai
 from langchain.llms import OpenAI, AzureOpenAI
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
-from langchain.chains import RetrievalQA
+from langchain.chains import RetrievalQA, AnalyzeDocumentChain
+from langchain.chains.summarize import load_summarize_chain
 
 
 import sys
 sys.path.append('../') 
-from pdf.document import load_pdf_from_dir, split_document
+from pdf.document import load_pdf_from_dir, split_document, load_pdf_into_str
 
 OPENAI_API_TYPE="azure"
 OPENAI_API_VERSION="2023-05-15"
 
+# Azure OpenAI credentials
+openai.api_key = "***REMOVED***"
+openai.api_base = "***REMOVED***" # your endpoint should look like the following https://YOUR_RESOURCE_NAME.openai.azure.com/
+openai.api_type = 'azure'
+openai.api_version = '2023-05-15' # this may change in the future
 
-def client_init(api_key, endpoint, deployment="gpt-35-turbo-16k"):
+deployment_name='gpt-35-turbo-16k'
+
+def init_instance(api_key, endpoint, deployment="gpt-35-turbo-16k"):
     # Uses langchain.llms.OpenAI to create an OpenAI instance
 
     # Create an instance of Azure OpenAI
@@ -53,9 +61,13 @@ def client_init(api_key, endpoint, deployment="gpt-35-turbo-16k"):
     # llm("Tell me a joke")
 
 def init_llm_chain(api_key, endpoint, deployment="gpt-35-turbo-16k"):
+    # DOES NOT WORK
+    # gpt-35-turbo-16k does not support embeddings
+
+
     embeddings = OpenAIEmbeddings(
         openai_api_key=api_key,
-        model="text-davinci-003", #text-davinci-002
+        model="text-embedding-ada-002", #text-davinci-002
         openai_api_base=endpoint,
         openai_api_type=OPENAI_API_TYPE,
         deployment=deployment
@@ -69,8 +81,27 @@ def init_llm_chain(api_key, endpoint, deployment="gpt-35-turbo-16k"):
     print("hi")
     chain = RetrievalQA.from_chain_type(llm=azure_llm, chain_type="stuff", retriever=doc_search.as_retriever())
 
-    print("reached!")
+
+def summary():
+    pdf_str = load_pdf_into_str("../sample.pdf")
+
+
+
+    # test: Ask openAI to summarize the pdf
+    response = openai.ChatCompletion.create(
+        engine=deployment_name, 
+        max_tokens=750,
+        messages=[
+            {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
+            {"role": "user", "content": pdf_str},
+            {"role": "user", "content": "Provide a short summary of the pdf in 1-2 sentences"}
+        ]
+    )
+
+    print("Summary: " + response['choices'][0]['message']['content'])
+
 
 if __name__ == "__main__":
-    init_llm_chain(api_key="***REMOVED***", endpoint="***REMOVED***", deployment="gpt-35-turbo-16k")
+    summary()
+    # init_llm_chain(api_key="***REMOVED***", endpoint="***REMOVED***", deployment="gpt-35-turbo-16k")
     
