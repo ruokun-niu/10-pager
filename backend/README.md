@@ -1,5 +1,17 @@
-Run the following commands
+**Setting up the backend service**
 ```
-source env/bin/activate
-pip install flask flask-cors
+virtualenv venv --python=python3.9
+source ./venv/bin/activate
+pip install Flask
+pip install Flask-RESTful
+pip install Flask-JWT
+pip install -U flask-cors
+pip install langchain
+pip install flask_caching
+pip install pypdf
+pip install openai
+
+OR `pip install -r requirements.txt`
 ```
+
+**OpenAI**

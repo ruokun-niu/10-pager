@@ -34,4 +34,4 @@ def load_pdf_local(dir_path):
 
 
 if __name__ == "__main__":
-    load_pdf_local()
+    load_pdf_local("../offer-template.pdf")
