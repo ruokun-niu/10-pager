@@ -23,6 +23,9 @@
 from flask import Flask
 from flask_caching import Cache
 from flask_cors import CORS
+from pdf.document import load_pdf_from_dir, split_document
+from llm.openai_instance import client_init
+
 
 app = Flask(__name__)
 app.config["CACHE_TYPE"] = "SimpleCache"
@@ -33,6 +36,15 @@ CORS(app)
 def hello():
     return "Hello, World!"
 
+@app.route('/pdf',  methods=['POST'])
+def load_pdf():
+    # openai_instance = client_init("***REMOVED***", "***REMOVED***", "gpt-35-turbo-16k")
+    pdf_doc = load_pdf_from_dir("sample.pdf")    
+    splitted_doc = split_document(pdf_doc)
+
+
+
 
 if __name__ == "__main__":
-    app.run("localhost", 5000, debug=True)
+    load_pdf()
+    # app.run("localhost", 5000, debug=True)

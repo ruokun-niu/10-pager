@@ -22,16 +22,26 @@
 
 
 from langchain.document_loaders import PyPDFLoader
+from langchain.text_splitter import CharacterTextSplitter
 
-def load_pdf_local(dir_path):
+def load_pdf_from_dir(dir_path):
     loader = PyPDFLoader(dir_path)
-    pages = loader.load_and_split()
-    print(pages[0])
+    document = loader.load()
+    # pages = loader.load_and_split()
 
-    return pages[0]
+    return document
 
 
+def split_document(document):
+    # Split the document into pages
+    
+    text_splitter = CharacterTextSplitter(chunk_size = 30, chunk_overlap = 10)
+
+    splitted_document = text_splitter.split_documents(document)
+
+    return splitted_document
 
 
 if __name__ == "__main__":
-    load_pdf_local("../offer-template.pdf")
+    doc = load_pdf_from_dir("../sample.pdf")
+    splitted = split_document(doc)
