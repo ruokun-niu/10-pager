@@ -7,7 +7,42 @@ function App() {
   const [prompt, updatePrompt] = useState(undefined);
   const [loading, setLoading] = useState(false);
   const [answer, setAnswer] = useState(undefined);
+
+  const [showModal, setShowModal] = useState(false);
+  const [pdfUploaded, setPdfUploaded] = useState(false);
+  const [pdfFileName, setPdfFileName] = useState("");
   
+  const handlePdfUpload = (event) => {
+    const file = event.target.files[0];
+
+    if (file && file.type === "application/pdf") {
+      //Calling the api to upload the pdf
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const requestOptions = {
+          method: "POST",
+          body: formData,
+        };
+        const res = fetch("/api/pdf/upload", requestOptions);
+        if (!res.ok) {
+          throw new Error("Something went wrong");
+        }
+      } catch (err) {
+        console.error(err, "err");
+      }
+      
+
+      setPdfUploaded(true);
+      setPdfFileName(file.name);
+      setShowModal(false); // Close the modal after successful upload
+
+      
+    } else {
+      alert("Please upload a valid PDF file.");
+    }
+  };
 
   const sendPrompt = async (event) => {
     if (event.key !== "Enter") {
@@ -50,19 +85,45 @@ function App() {
     <div className="app">
       <div className="app-container">
         <div className="spotlight__wrapper">
-          <input
-            type="text"
-            className="spotlight__input"
-            placeholder="Ask me anything..."
-            onChange={(e) => updatePrompt(e.target.value)}
-            onKeyDown={(e) => sendPrompt(e)}
-            disabled={loading}
-            style={{
-              backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
-            }}
-          />
-          <div className="spotlight__answer">{answer && <p>{answer}</p>}</div>
+          {!pdfUploaded ? (
+            <div className="container">
+              <input type="file" accept=".pdf" onChange={handlePdfUpload}/>
+            </div>
+          ) : (
+            <>
+              <p>Uploaded PDF File: {pdfFileName}</p>
+              <input
+                type="text"
+                className="spotlight__input"
+                placeholder="Ask me anything..."
+                onChange={(e) => updatePrompt(e.target.value)}
+                onKeyDown={(e) => sendPrompt(e)}
+                disabled={loading}
+                style={{
+                  backgroundImage: loading ? `url(${loadingGif})` : `url(${lens})`,
+                }}
+              />
+              <div className="spotlight__answer">{answer && <p>{answer}</p>}</div>
+            </>
+          )}
+
+          
         </div>
+          {showModal && (
+            <div className="modal">
+              <div className="modal-content">
+                <h2>Upload PDF</h2>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handlePdfUpload}
+                />
+                <button onClick={() => setShowModal(false)}>Close</button>
+              </div>
+            </div>
+          )}
+        
+      
       </div>
     </div>
   );

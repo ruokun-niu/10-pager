@@ -43,7 +43,7 @@ openai.api_version = '2023-05-15' # this may change in the future
 deployment_name='gpt-35-turbo-16k'
 
 path_to_pdf = "uploads/sample.pdf"
-pdf_str = load_pdf_into_str(path_to_pdf)
+
 
 def init_instance(api_key, endpoint, deployment="gpt-35-turbo-16k"):
     # Uses langchain.llms.OpenAI to create an OpenAI instance
@@ -128,6 +128,7 @@ def pdf_assistant_local():
 
 
 def pdf_assistant(user_input):
+    pdf_str = load_pdf_into_str(path_to_pdf)
     response = openai.ChatCompletion.create(
             engine=deployment_name, 
             max_tokens=1250,
