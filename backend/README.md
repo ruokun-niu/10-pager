@@ -14,6 +14,7 @@ pip install "unstructured[all-docs]"
 pip install chromadb
 pip install tiktoken
 
+
 OR `pip install -r requirements.txt`
 ```
 

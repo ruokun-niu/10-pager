@@ -20,11 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-
+import pypdf
 from langchain.document_loaders import PyPDFLoader
 from langchain.text_splitter import CharacterTextSplitter
 
 def load_pdf_from_dir(dir_path):
+    # langchain, does not work with our current deployment
     loader = PyPDFLoader(dir_path)
     document = loader.load()
     # pages = loader.load_and_split()
@@ -41,7 +42,17 @@ def split_document(document):
 
     return splitted_document
 
+def load_pdf_into_str(dir_path):
+    reader = pypdf.PdfReader(dir_path)
+
+    extracted_text = ""
+    for page_num in range(len(reader.pages)):
+        page = reader.pages[page_num]
+        extracted_text += page.extract_text()
+
+    return extracted_text
 
 if __name__ == "__main__":
-    doc = load_pdf_from_dir("../sample.pdf")
-    splitted = split_document(doc)
+    extracted = load_pdf_into_str("../sample.pdf")
+    # doc = load_pdf_from_dir("../sample.pdf")
+    # splitted = split_document(doc)
