@@ -42,6 +42,8 @@ openai.api_version = '2023-05-15' # this may change in the future
 
 deployment_name='gpt-35-turbo-16k'
 
+path_to_pdf = "uploads/sample.pdf"
+pdf_str = load_pdf_into_str(path_to_pdf)
 
 def init_instance(api_key, endpoint, deployment="gpt-35-turbo-16k"):
     # Uses langchain.llms.OpenAI to create an OpenAI instance
@@ -97,7 +99,7 @@ def summary():
 
     print("Summary: " + response['choices'][0]['message']['content'])
 
-def pdf_assistant():
+def pdf_assistant_local():
     pdf_str = load_pdf_into_str("../sample.pdf")
 
     print("Initiating pdf assistant...")
@@ -124,9 +126,40 @@ def pdf_assistant():
         print("Assistant: " + assistant_response)
 
 
+
+def pdf_assistant(user_input):
+    response = openai.ChatCompletion.create(
+            engine=deployment_name, 
+            max_tokens=1250,
+            messages=[
+                {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
+                {"role": "user", "content": pdf_str},
+                {"role": "user", "content": user_input}
+            ]
+        )
+    assistant_response = response['choices'][0]['message']['content']
+
+    return assistant_response
+
+
+def openai_instance(user_input):
+    user_input = user_input.strip().lower()
+        
+    response = openai.ChatCompletion.create(
+        engine=deployment_name, 
+        max_tokens=1250,
+        messages=[
+            {"role": "system", "content": "You are an assistant that will analyze and answer questions"},
+            {"role": "user", "content": user_input}
+        ]
+    )
+    assistant_response = response['choices'][0]['message']['content']
+    print("Assistant: " + assistant_response)
+
+    return assistant_response
         
 
 if __name__ == "__main__":
-    pdf_assistant()
+    pdf_assistant_local()
     # init_llm_chain(api_key="***REMOVED***", endpoint="***REMOVED***", deployment="gpt-35-turbo-16k")
     
