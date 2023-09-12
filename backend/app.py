@@ -95,7 +95,9 @@ def ask_openai_question():
     request_content_str = request.data.decode('utf-8')
     # print(request_content_str)
     # prompt = request.form['prompt']
-    return openai_instance(request_content_str)
+    response = openai_instance(request_content_str)
+
+    return jsonify({"message": response})
 
 
 
