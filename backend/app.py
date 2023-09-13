@@ -111,8 +111,6 @@ def obtain_azure_openai_creds():
 
         response = {
             'message': 'Inputs received and processed successfully',
-            'api_key': api_key,
-            'endpoint': endpoint
         }
 
         open_ai.openai_auth(api_key, endpoint)

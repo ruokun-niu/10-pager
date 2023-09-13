@@ -22,7 +22,6 @@ pip install flask_caching
 pip install pypdf
 pip install openai
 pip install "unstructured[all-docs]"
-pip install chromadb
 pip install tiktoken
 ```
 

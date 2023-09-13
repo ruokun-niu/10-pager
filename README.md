@@ -18,4 +18,9 @@ TODO: Add video/gif
 2. Frontend setup:
    - Navigate to `10-pager-frontend` and follow this [instruction](./10-pager-frontend/README.md) 
 1. Backend setup:
-   - Navigate to `backend` and follow this instruction
+   - Navigate to `backend` and follow this [instruction](./backend/README.md)
+   - The backend will be available at `localhost:5002`
+4. Navigate to `localhost:5173` in your browser
+5. You can now use 10-pager! 
+
+
