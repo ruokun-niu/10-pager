@@ -4,7 +4,8 @@ Why spend time reading, summarizing, and interpreting a document when you have a
 
 10-pager is chatbot AI that helps you to breakdown and understand a document by answering your specific questions on the document. 
 
-TODO: Add video/gif
+Example usage: Prompting 10-pager various questions regarding an offer letter: 
+![](docs/demo.gif)
 
 
 #### Currently supported documents:
