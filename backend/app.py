@@ -24,7 +24,7 @@ from flask import Flask, request, jsonify, render_template, abort
 from flask_caching import Cache
 from flask_cors import CORS
 from pdf.document import load_pdf_from_dir, split_document
-from llm.openai_instance import openai_instance, pdf_assistant
+from llm.openai_instance import OpenAIInstance
 from utils.utils import allowed_file
 
 import os
@@ -48,6 +48,8 @@ try:
 except Exception as e:
     app.logger.info("An error occurred while creating temp folder")
     app.logger.error("Exception occurred : {}".format(e))
+
+open_ai = OpenAIInstance()
 
 @app.route('/')
 def index():
@@ -84,7 +86,7 @@ def openai_pdf_instance():
     if user_input == "exit":
         return
     
-    response = pdf_assistant(user_input)
+    response = open_ai.pdf_assistant(user_input)
 
 
     return jsonify({"message": response})
@@ -93,7 +95,7 @@ def openai_pdf_instance():
 @app.route('/ask', methods=['POST'])
 def ask_openai_question():
     request_content_str = request.data.decode('utf-8')
-    response = openai_instance(request_content_str)
+    response = open_ai.openai_instance(request_content_str)
 
     return jsonify({"message": response})
 
@@ -103,7 +105,7 @@ def obtain_azure_openai_creds():
     global api_key, endpoint
     try:
         data = request.get_json()
-        
+        print(data)
         api_key = data.get('api_key')
         endpoint = data.get('endpoint')
 
@@ -112,6 +114,8 @@ def obtain_azure_openai_creds():
             'api_key': api_key,
             'endpoint': endpoint
         }
+
+        open_ai.openai_auth(api_key, endpoint)
         return jsonify(response)
     
     except Exception as e:

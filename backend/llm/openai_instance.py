@@ -33,16 +33,75 @@ from pdf.document import load_pdf_from_dir, split_document, load_pdf_into_str
 
 OPENAI_API_TYPE="azure"
 OPENAI_API_VERSION="2023-05-15"
+DEPLOYMENT_NAME='gpt-35-turbo-16k'
 
-# Azure OpenAI credentials
-openai.api_key = "***REMOVED***"
-openai.api_base = "***REMOVED***" # your endpoint should look like the following https://YOUR_RESOURCE_NAME.openai.azure.com/
-openai.api_type = 'azure'
-openai.api_version = '2023-05-15' # this may change in the future
+PATH_TO_PDF = "uploads/sample.pdf"
 
-deployment_name='gpt-35-turbo-16k'
+class OpenAIInstance:
+    openai = openai
+    api_key = None
+    endpoint = None
 
-path_to_pdf = "uploads/sample.pdf"
+
+    def __init__(self):
+        pass
+
+    def openai_auth(self, api_key, endpoint):
+        self.openai.api_key = api_key
+        self.openai.api_base = endpoint
+        self.openai.api_type = OPENAI_API_TYPE
+        self.openai.api_version = OPENAI_API_VERSION # this may change in the future
+
+
+    def pdf_assistant(self, user_input):
+        pdf_str = load_pdf_into_str(PATH_TO_PDF)
+        response = self.openai.ChatCompletion.create(
+                engine=DEPLOYMENT_NAME, 
+                max_tokens=1250,
+                messages=[
+                    {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
+                    {"role": "user", "content": pdf_str},
+                    {"role": "user", "content": user_input}
+                ]
+            )
+        assistant_response = response['choices'][0]['message']['content']
+        return assistant_response
+    
+
+    def summary(self):
+        pdf_str = load_pdf_into_str("../sample.pdf")
+
+        # test: Ask openAI to summarize the pdf
+        response = openai.ChatCompletion.create(
+            engine=DEPLOYMENT_NAME, 
+            max_tokens=750,
+            messages=[
+                {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
+                {"role": "user", "content": pdf_str},
+                {"role": "user", "content": "Provide a short summary of the pdf in 1-2 sentences"}
+            ]
+        )
+
+        print("Summary: " + response['choices'][0]['message']['content'])
+
+
+    def openai_instance(self, user_input):
+        user_input = user_input.strip().lower()
+            
+        response = openai.ChatCompletion.create(
+            engine=DEPLOYMENT_NAME, 
+            max_tokens=1250,
+            messages=[
+                {"role": "system", "content": "You are an assistant that will analyze and answer questions"},
+                {"role": "user", "content": user_input}
+            ]
+        )
+        assistant_response = response['choices'][0]['message']['content']
+        print("Assistant: " + assistant_response)
+
+        return assistant_response
+
+
 
 
 def init_instance(api_key, endpoint, deployment="gpt-35-turbo-16k"):
@@ -78,26 +137,10 @@ def init_llm_chain(api_key, endpoint, deployment="gpt-35-turbo-16k"):
     splitted_doc = split_document(pdf_doc)
     doc_search = Chroma.from_documents(splitted_doc, embeddings) #doc_search is a chroma vector store
 
-    azure_llm = client_init(api_key, endpoint, deployment)
+    azure_llm = init_instance(api_key, endpoint, deployment)
     print("hi")
     chain = RetrievalQA.from_chain_type(llm=azure_llm, chain_type="stuff", retriever=doc_search.as_retriever())
 
-
-def summary():
-    pdf_str = load_pdf_into_str("../sample.pdf")
-
-    # test: Ask openAI to summarize the pdf
-    response = openai.ChatCompletion.create(
-        engine=deployment_name, 
-        max_tokens=750,
-        messages=[
-            {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
-            {"role": "user", "content": pdf_str},
-            {"role": "user", "content": "Provide a short summary of the pdf in 1-2 sentences"}
-        ]
-    )
-
-    print("Summary: " + response['choices'][0]['message']['content'])
 
 def pdf_assistant_local():
     pdf_str = load_pdf_into_str("../sample.pdf")
@@ -114,7 +157,7 @@ def pdf_assistant_local():
             break
             
         response = openai.ChatCompletion.create(
-            engine=deployment_name, 
+            engine=DEPLOYMENT_NAME, 
             max_tokens=1250,
             messages=[
                 {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
@@ -125,42 +168,3 @@ def pdf_assistant_local():
         assistant_response = response['choices'][0]['message']['content']
         print("Assistant: " + assistant_response)
 
-
-
-def pdf_assistant(user_input):
-    pdf_str = load_pdf_into_str(path_to_pdf)
-    response = openai.ChatCompletion.create(
-            engine=deployment_name, 
-            max_tokens=1250,
-            messages=[
-                {"role": "system", "content": "You are an assistant that will analyze and answer questions based on an input pdf. Users will now supply the pdf as a string and will then ask questions"},
-                {"role": "user", "content": pdf_str},
-                {"role": "user", "content": user_input}
-            ]
-        )
-    assistant_response = response['choices'][0]['message']['content']
-
-    return assistant_response
-
-
-def openai_instance(user_input):
-    user_input = user_input.strip().lower()
-        
-    response = openai.ChatCompletion.create(
-        engine=deployment_name, 
-        max_tokens=1250,
-        messages=[
-            {"role": "system", "content": "You are an assistant that will analyze and answer questions"},
-            {"role": "user", "content": user_input}
-        ]
-    )
-    assistant_response = response['choices'][0]['message']['content']
-    print("Assistant: " + assistant_response)
-
-    return assistant_response
-        
-
-if __name__ == "__main__":
-    pdf_assistant_local()
-    # init_llm_chain(api_key="***REMOVED***", endpoint="***REMOVED***", deployment="gpt-35-turbo-16k")
-    

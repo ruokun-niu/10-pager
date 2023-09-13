@@ -48,27 +48,28 @@ function App() {
     }
   };
 
-
-  const handleCredentialsSubmit = (event) => {
+  const handleCredentialsSubmit = () => {
     try {
-      const api_key = apiKey;
-      const endpoint = endpoint;
-
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key, endpoint }),
+        body: JSON.stringify({api_key: apiKey, endpoint: endpoint }),
       };
 
+      window.console.log('requestOptions', requestOptions);
       const res = fetch("/api/openai/azure/creds", requestOptions);
       if (!res.ok) {
         throw new Error("Something went wrong");
       }
+      
     } catch (err) {
       console.error(err, "err");
     }
-    setPageStage(3);
 
+
+    setPageStage(3);
+    setApiKey("");
+    setEndpoint("");
   };
 
 
@@ -83,19 +84,30 @@ function App() {
   const pageStagetwo = (
     <React.Fragment>
       <p>Uploaded PDF File: {pdfFileName}</p>
-        <input
+        <label className="input">
+        <input 
+          className="input__label"
           type="text"
           placeholder="API Key"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
         /> <div></div>
         <input
+          className="input__label"
           type="text"
           placeholder="Endpoint"
           value={endpoint}
           onChange={(e) => setEndpoint(e.target.value)}
         />
+        <input
+          className="input__field"
+          type="text"
+          placeholder="gpt-35-turbo-16k"
+          value="gpt-35-turbo-16k"
+          readOnly
+        />
         <button onClick={handleCredentialsSubmit}>Submit Credentials</button>
+      </label>
     </React.Fragment>
   ); 
 
