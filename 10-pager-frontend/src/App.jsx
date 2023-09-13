@@ -116,36 +116,6 @@ function App() {
     </React.Fragment>
   ); 
 
-  // const pageStagetwo = (
-  //   <React.Fragment>
-  //     <p>Uploaded PDF File: {pdfFileName}</p>
-  //     <p>Enter Azure OpenAI credentials</p>
-  //       <label className="input">
-  //       <input 
-  //         className="input__label"
-  //         type="text"
-  //         placeholder="API Key"
-  //         value={apiKey}
-  //         onChange={(e) => setApiKey(e.target.value)}
-  //       /> <div></div>
-  //       <input
-  //         className="input__label"
-  //         type="text"
-  //         placeholder="Endpoint"
-  //         value={endpoint}
-  //         onChange={(e) => setEndpoint(e.target.value)}
-  //       />
-  //       <input
-  //         className="input__label"
-  //         type="text"
-  //         placeholder="gpt-35-turbo-16k"
-  //         value="gpt-35-turbo-16k"
-  //         readOnly
-  //       />
-  //       <button onClick={handleCredentialsSubmit}>Submit Credentials</button>
-  //     </label>
-  //   </React.Fragment>
-  // ); 
 
   const pageStagethree = (
     <React.Fragment>
