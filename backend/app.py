@@ -93,12 +93,30 @@ def openai_pdf_instance():
 @app.route('/ask', methods=['POST'])
 def ask_openai_question():
     request_content_str = request.data.decode('utf-8')
-    # print(request_content_str)
-    # prompt = request.form['prompt']
     response = openai_instance(request_content_str)
 
     return jsonify({"message": response})
 
+
+@app.route('/openai/azure/creds', methods=['POST'])
+def obtain_azure_openai_creds():
+    global api_key, endpoint
+    try:
+        data = request.get_json()
+        
+        api_key = data.get('api_key')
+        endpoint = data.get('endpoint')
+
+        response = {
+            'message': 'Inputs received and processed successfully',
+            'api_key': api_key,
+            'endpoint': endpoint
+        }
+        return jsonify(response)
+    
+    except Exception as e:
+        error_message = str(e)
+        return jsonify({'error': error_message})
 
 
 if __name__ == "__main__":
